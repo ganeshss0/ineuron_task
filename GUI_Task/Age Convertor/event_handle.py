@@ -55,9 +55,9 @@ class handler:
         if not self.selected_date_top == self.selected_date_btm:
             self.difference = abs(self.selected_date_top - self.selected_date_btm).days
             years = self.difference // 365
-            months = (self.difference - (years * 365)) // 12
-            weeks = (self.difference - (years * 365) - (months * 12)) // 7
-            days = (self.difference - (years * 365) - (months * 12))
+            months = (self.difference - (years * 365)) // 30
+            weeks = (self.difference - (years * 365) - (months * 30)) // 7
+            days = (self.difference - (years * 365) - (months * 30) - (weeks * 7))
             self.UI.label_result.config(text = f'{years} years {months} months {weeks} weeks {days} days')
             self.UI.label_days.config(text = str(self.difference) + ' days')
         else:
