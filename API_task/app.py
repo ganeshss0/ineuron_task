@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import pandas as pd
+
 app = Flask(__name__)
 
 def get_items() -> 'list[dict]':
@@ -7,7 +8,7 @@ def get_items() -> 'list[dict]':
     for i in range(1, 7):
         item_name = request.form[f'item-{i}']
         item_cost = request.form[f'cost-{i}']
-        items.append({'Name':item_name, 'Price' : float(item_cost)})
+        items.append({'Item': i, 'Name':item_name, 'Price' : float(item_cost)})
     return items
 
 def get_discount(total_bill: int):
@@ -19,7 +20,7 @@ def get_discount(total_bill: int):
     elif total_bill > 2000:
         discount = 0.3
     
-    return str(discount * 100)+'%', discount * total_bill * -1
+    return str(discount * 100)+'%', round(discount * total_bill * -1, 2)
     
 @app.route('/')
 def homePage():
@@ -28,17 +29,16 @@ def homePage():
 @app.route('/checkout', methods = ['POST'])
 def CheckOut():
     items = get_items()
-    bill = pd.DataFrame(items, index = [1, 2, 3, 4, 5, 6])
+    bill = pd.DataFrame(items)
     total = bill.Price.sum()
     
     discount = get_discount(total)
-    total += discount[1]
-    result = [{'Name':'', 'Price': ''}, {'Name': f'Discount({discount[0]})', 'Price' : discount[1]}, {'Name': 'Total', 'Price': total}]
-    total_amount = pd.DataFrame(result, index = ['', '*', '*'])
-    bill = pd.concat((bill, total_amount))
-    return bill.to_html(justify='center')
-    
+    new_total = round(total + discount[1], 2)
+    result = [['Amount', total], [f'Discount({discount[0]})', discount[1]], ['Total',new_total]]
 
+    return render_template('result.html', bill = bill.to_numpy(), amount = result)
+    
+    # Template.render()
 
 
 
